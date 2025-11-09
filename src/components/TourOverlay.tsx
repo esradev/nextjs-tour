@@ -1,5 +1,3 @@
-"use client"
-
 import { useEffect, useState, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import type { TourOverlayProps, ElementPosition } from "../types"
@@ -35,18 +33,29 @@ export function TourOverlay({
 
       async function loadLottie() {
         try {
-          // Fetch animation JSON
+          // Fetch animation JSON with better error handling
           const res = await fetch(lottieAnimationUrl!)
-          if (res.ok) {
-            const json = await res.json()
-            setAnimationData(json)
+          if (!res.ok) {
+            throw new Error(
+              `Failed to fetch Lottie animation: ${res.status} ${res.statusText}`
+            )
           }
+          const json = await res.json()
+          if (!json || typeof json !== "object") {
+            throw new Error("Invalid Lottie animation data received")
+          }
+          setAnimationData(json)
 
-          // Dynamically import lottie-react
+          // Dynamically import lottie-react with error handling
           const lottieModule = await import("lottie-react")
+          if (!lottieModule.default) {
+            throw new Error("Failed to import lottie-react component")
+          }
           setLottieComp(() => lottieModule.default)
         } catch (e) {
-          console.error("Failed to load Lottie:", e)
+          console.error("Failed to load Lottie animation:", e)
+          setAnimationData(null)
+          setLottieComp(null)
         } finally {
           setIsLottieLoading(false)
         }
@@ -72,14 +81,76 @@ export function TourOverlay({
   useEffect(() => {
     if (!isActive || !currentStep) return
 
+    console.log("Tour step changed:", {
+      isActive,
+      currentStepId: currentStep?.id,
+      target: currentStep?.target,
+      position: currentStep?.position
+    })
+
     const updateElementPosition = () => {
+      if (!currentStep?.target) {
+        console.error("Tour step target is missing")
+        return
+      }
+
+      console.log("Looking for element:", currentStep.target)
+
       const element = document.querySelector(currentStep.target)
       if (!element) {
         console.warn(`Tour target element not found: ${currentStep.target}`)
+        // Try to wait a bit and retry once
+        setTimeout(() => {
+          const retryElement = document.querySelector(currentStep.target)
+          if (!retryElement) {
+            console.error(
+              `Tour target element still not found after retry: ${currentStep.target}`
+            )
+            // For debugging, let's log all available elements
+            console.log(
+              "Available elements with classes:",
+              Array.from(document.querySelectorAll("[class]")).map(
+                el => el.className
+              )
+            )
+            return
+          }
+          // If found on retry, continue with position calculation
+          const retryRect = retryElement.getBoundingClientRect()
+          if (retryRect.width === 0 && retryRect.height === 0) {
+            console.warn(
+              `Tour target element is not visible after retry: ${currentStep.target}`
+            )
+            return
+          }
+
+          const scrollTop =
+            window.pageYOffset || document.documentElement.scrollTop
+          const scrollLeft =
+            window.pageXOffset || document.documentElement.scrollLeft
+
+          const position: ElementPosition = {
+            top: retryRect.top + scrollTop,
+            left: retryRect.left + scrollLeft,
+            width: retryRect.width,
+            height: retryRect.height,
+            centerX: retryRect.left + scrollLeft + retryRect.width / 2,
+            centerY: retryRect.top + scrollTop + retryRect.height / 2
+          }
+
+          setElementPosition(position)
+        }, 500)
         return
       }
 
       const rect = element.getBoundingClientRect()
+      if (rect.width === 0 && rect.height === 0) {
+        console.warn(
+          `Tour target element is not visible: ${currentStep.target}`
+        )
+        return
+      }
+
       const scrollTop = window.pageYOffset || document.documentElement.scrollTop
       const scrollLeft =
         window.pageXOffset || document.documentElement.scrollLeft
@@ -95,12 +166,13 @@ export function TourOverlay({
 
       setElementPosition(position)
 
-      // Calculate tooltip position
-      if (tooltipRef.current) {
+      // Calculate tooltip position with better SSR handling
+      if (tooltipRef.current && typeof window !== "undefined") {
         const tooltipRect = tooltipRef.current.getBoundingClientRect()
         const viewportWidth = window.innerWidth
         const viewportHeight = window.innerHeight
 
+        // Default positioning
         let x = position.centerX - tooltipRect.width / 2
         let y = position.top - tooltipRect.height - 20
 
@@ -115,7 +187,7 @@ export function TourOverlay({
             y = position.top - tooltipRect.height - 20
             break
           case "top-right":
-            x = position.left + position.width - tooltipRect.width
+            x = Math.max(0, position.left + position.width - tooltipRect.width)
             y = position.top - tooltipRect.height - 20
             break
           case "bottom":
@@ -127,7 +199,7 @@ export function TourOverlay({
             y = position.top + position.height + 20
             break
           case "bottom-right":
-            x = position.left + position.width - tooltipRect.width
+            x = Math.max(0, position.left + position.width - tooltipRect.width)
             y = position.top + position.height + 20
             break
           case "left":
@@ -140,7 +212,7 @@ export function TourOverlay({
             break
           case "left-bottom":
             x = position.left - tooltipRect.width - 20
-            y = position.top + position.height - tooltipRect.height
+            y = Math.max(0, position.top + position.height - tooltipRect.height)
             break
           case "right":
             x = position.left + position.width + 20
@@ -152,49 +224,49 @@ export function TourOverlay({
             break
           case "right-bottom":
             x = position.left + position.width + 20
-            y = position.top + position.height - tooltipRect.height
+            y = Math.max(0, position.top + position.height - tooltipRect.height)
             break
           case "center":
-            x = viewportWidth / 2 - tooltipRect.width / 2
-            y = viewportHeight / 2 - tooltipRect.height / 2
+            x = Math.max(0, viewportWidth / 2 - tooltipRect.width / 2)
+            y = Math.max(0, viewportHeight / 2 - tooltipRect.height / 2)
             break
           default:
             // Auto-calculate best position based on available space
-            const spaceTop = position.top
-            const spaceBottom =
+            const spaceTop = Math.max(0, position.top)
+            const spaceBottom = Math.max(
+              0,
               viewportHeight - (position.top + position.height)
-            const spaceLeft = position.left
-            const spaceRight = viewportWidth - (position.left + position.width)
+            )
+            const spaceLeft = Math.max(0, position.left)
+            const spaceRight = Math.max(
+              0,
+              viewportWidth - (position.left + position.width)
+            )
+            const tooltipHeight = tooltipRect.height || 200 // fallback
+            const tooltipWidth = tooltipRect.width || 320 // fallback
 
             // Determine best vertical position
-            if (spaceTop > tooltipRect.height + 40) {
-              y = position.top - tooltipRect.height - 20
-            } else if (spaceBottom > tooltipRect.height + 40) {
+            if (spaceTop > tooltipHeight + 40) {
+              y = Math.max(0, position.top - tooltipHeight - 20)
+            } else if (spaceBottom > tooltipHeight + 40) {
               y = position.top + position.height + 20
-            } else if (spaceLeft > tooltipRect.width + 40) {
-              x = position.left - tooltipRect.width - 20
-              y = position.centerY - tooltipRect.height / 2
-            } else if (spaceRight > tooltipRect.width + 40) {
+            } else if (spaceLeft > tooltipWidth + 40) {
+              x = Math.max(0, position.left - tooltipWidth - 20)
+              y = Math.max(0, position.centerY - tooltipHeight / 2)
+            } else if (spaceRight > tooltipWidth + 40) {
               x = position.left + position.width + 20
-              y = position.centerY - tooltipRect.height / 2
+              y = Math.max(0, position.centerY - tooltipHeight / 2)
             } else {
-              x = viewportWidth / 2 - tooltipRect.width / 2
-              y = viewportHeight / 2 - tooltipRect.height / 2
+              x = Math.max(0, viewportWidth / 2 - tooltipWidth / 2)
+              y = Math.max(0, viewportHeight / 2 - tooltipHeight / 2)
             }
 
-            // Determine best horizontal position
+            // Determine best horizontal position for top/bottom placements
             if (
-              spaceLeft > tooltipRect.width + 40 &&
-              y === position.centerY - tooltipRect.height / 2
+              y === position.top - tooltipHeight - 20 ||
+              y === position.top + position.height + 20
             ) {
-              x = position.left - tooltipRect.width - 20
-            } else if (
-              spaceRight > tooltipRect.width + 40 &&
-              y === position.centerY - tooltipRect.height / 2
-            ) {
-              x = position.left + position.width + 20
-            } else {
-              x = position.centerX - tooltipRect.width / 2
+              x = Math.max(0, position.centerX - tooltipWidth / 2)
             }
         }
 
@@ -203,40 +275,57 @@ export function TourOverlay({
         if (x < margin) {
           x = margin
         } else if (x + tooltipRect.width > viewportWidth - margin) {
-          x = viewportWidth - tooltipRect.width - margin
+          x = Math.max(margin, viewportWidth - tooltipRect.width - margin)
         }
 
         if (y < margin) {
           y = margin
         } else if (y + tooltipRect.height > viewportHeight - margin) {
-          y = viewportHeight - tooltipRect.height - margin
+          y = Math.max(margin, viewportHeight - tooltipRect.height - margin)
         }
 
         setTooltipPosition({ x, y })
       }
 
       // Scroll element into view if needed
-      element.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-        inline: "center"
-      })
+      if (typeof window !== "undefined" && element) {
+        try {
+          element.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+            inline: "center"
+          })
+        } catch (e) {
+          console.warn("Failed to scroll element into view:", e)
+        }
+      }
     }
 
-    // Initial position calculation
-    updateElementPosition()
+    // Delay initial calculation to ensure DOM is ready
+    const timer = setTimeout(updateElementPosition, 100)
 
     // Update position on window resize or scroll
-    window.addEventListener("resize", updateElementPosition)
-    window.addEventListener("scroll", updateElementPosition)
+    if (typeof window !== "undefined") {
+      window.addEventListener("resize", updateElementPosition)
+      window.addEventListener("scroll", updateElementPosition)
+    }
 
     return () => {
-      window.removeEventListener("resize", updateElementPosition)
-      window.removeEventListener("scroll", updateElementPosition)
+      clearTimeout(timer)
+      if (typeof window !== "undefined") {
+        window.removeEventListener("resize", updateElementPosition)
+        window.removeEventListener("scroll", updateElementPosition)
+      }
     }
   }, [currentStep, isActive])
 
   if (!isActive || !currentStep) {
+    return null
+  }
+
+  // Guard against missing target
+  if (!currentStep.target) {
+    console.error("Tour step is missing a target selector")
     return null
   }
 
@@ -329,8 +418,120 @@ export function TourOverlay({
     )
   }
 
+  // If elementPosition is not available yet, show a minimal overlay with just the tooltip in center
+  // This prevents the tour from not showing at all if element positioning fails
   if (!elementPosition) {
-    return null
+    return (
+      <AnimatePresence>
+        <div
+          ref={overlayRef}
+          className={`fixed inset-0 z-50 pointer-events-none ${className}`}
+          style={{ isolation: "isolate" }}
+        >
+          {/* Minimal overlay while waiting for element position */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 bg-black/60 pointer-events-auto"
+            onClick={onSkip}
+          />
+
+          {/* Centered tooltip as fallback */}
+          <motion.div
+            ref={tooltipRef}
+            initial={{ opacity: 0, y: 20, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.9 }}
+            transition={{ type: "spring", duration: 0.5 }}
+            className="absolute pointer-events-auto"
+            style={{
+              left: "50%",
+              top: "50%",
+              transform: "translate(-50%, -50%)"
+            }}
+          >
+            <div className="w-80 max-w-sm shadow-2xl border-0 bg-white dark:bg-gray-900 backdrop-blur-sm rounded-lg p-6">
+              <div className="mb-4">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 px-2 py-1 rounded">
+                      Step {stepNumber + 1} of {totalSteps}
+                    </span>
+                    <button
+                      onClick={onSkip}
+                      className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                </div>
+                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1 mb-4">
+                  <div
+                    className="bg-blue-500 h-1 rounded-full transition-all duration-300"
+                    style={{
+                      width: `${((stepNumber + 1) / totalSteps) * 100}%`
+                    }}
+                  />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                  {currentStep.title}
+                </h3>
+              </div>
+
+              <div className="mb-6">
+                <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+                  {currentStep.content}
+                </p>
+                <p className="text-xs text-orange-500 mt-2">
+                  Finding target element "{currentStep.target}"...
+                </p>
+              </div>
+
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex gap-2">
+                  {!isFirstStep && currentStep.showPrevious !== false && (
+                    <button
+                      onClick={onPrevious}
+                      className="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                    >
+                      ← Previous
+                    </button>
+                  )}
+
+                  {currentStep.showSkip !== false && !isLastStep && (
+                    <button
+                      onClick={onSkip}
+                      className="px-3 py-2 text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+                    >
+                      Skip →
+                    </button>
+                  )}
+                </div>
+
+                {isLastStep ? (
+                  <button
+                    onClick={handleLastStepComplete}
+                    className="px-4 py-2 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                  >
+                    {isLottieLoading ? "Loading..." : "🎉 Complete Tour"}
+                  </button>
+                ) : (
+                  currentStep.showNext !== false && (
+                    <button
+                      onClick={onNext}
+                      className="px-4 py-2 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                    >
+                      Next →
+                    </button>
+                  )
+                )}
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </AnimatePresence>
+    )
   }
 
   const progress = ((stepNumber + 1) / totalSteps) * 100
@@ -340,7 +541,10 @@ export function TourOverlay({
       <div
         ref={overlayRef}
         className={`fixed inset-0 z-50 pointer-events-none ${className}`}
-        style={{ isolation: "isolate" }}
+        style={{
+          isolation: "isolate",
+          overflow: "hidden" // Prevent horizontal scroll
+        }}
       >
         {/* Overlay with cutout */}
         <motion.div

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tour Test</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 20px;
+        font-family: sans-serif;
+      }
+      .test-element {
+        width: 200px;
+        height: 100px;
+        background: lightblue;
+        margin: 20px;
+        padding: 20px;
+        border: 2px solid #333;
+      }
+      .hero-section {
+        background: lightgreen;
+        padding: 40px;
+        margin: 20px 0;
+        text-align: center;
+      }
+      .main-header {
+        background: lightcoral;
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+      button {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        cursor: pointer;
+        border-radius: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="main-header">
+      <h1>Test Header</h1>
+    </div>
+
+    <div class="hero-section">
+      <h1>Hero Section</h1>
+      <button onclick="testTour()">Test Tour</button>
+    </div>
+
+    <div class="test-element">Test Element 1</div>
+
+    <div class="test-element">Test Element 2</div>
+
+    <script>
+      function testTour() {
+        console.log("Testing tour functionality...")
+
+        // Test if elements exist
+        console.log("Hero section:", document.querySelector(".hero-section"))
+        console.log("Header:", document.querySelector(".main-header"))
+        console.log(
+          "Test elements:",
+          document.querySelectorAll(".test-element")
+        )
+
+        // Test element visibility
+        const hero = document.querySelector(".hero-section")
+        if (hero) {
+          const rect = hero.getBoundingClientRect()
+          console.log("Hero section dimensions:", rect)
+          console.log(
+            "Hero section visible:",
+            rect.width > 0 && rect.height > 0
+          )
+        }
+      }
+    </script>
+  </body>
+</html>

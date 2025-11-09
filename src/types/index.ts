@@ -46,6 +46,14 @@ export interface TourContextValue {
   previousStep: () => void
   skipTour: () => void
   completeTour: () => void
+  lottieAnimationUrl?: string
+  theme?: {
+    primaryColor?: string
+    backgroundColor?: string
+    textColor?: string
+    borderRadius?: string
+    zIndex?: number
+  }
 }
 
 export interface TourOverlayProps {

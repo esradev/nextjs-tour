@@ -27,6 +27,23 @@ export default function RootLayout({
         <TourProvider lottieAnimationUrl={lottieUrl}>
           {children}
           <GlobalTourOverlay />
+          {/* Debug indicator */}
+          <div
+            id="tour-debug"
+            style={{
+              position: "fixed",
+              top: "10px",
+              right: "10px",
+              background: "red",
+              color: "white",
+              padding: "5px",
+              fontSize: "12px",
+              zIndex: 9999,
+              display: "none"
+            }}
+          >
+            Tour Debug Active
+          </div>
         </TourProvider>
       </body>
     </html>

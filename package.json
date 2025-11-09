@@ -1,6 +1,6 @@
 {
   "name": "nextjs-tour",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "type": "module",
   "description": "A beautiful, customizable tour/onboarding system for Next.js applications with Lottie animation support",
   "main": "dist/index.js",

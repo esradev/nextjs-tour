@@ -58,10 +58,22 @@ const demoTourSteps: TourStep[] = [
 ]
 
 function TourControls() {
-  const { startTour, isActive } = useTourContext()
+  const { startTour, isActive, currentStep, totalSteps, getCurrentStep } =
+    useTourContext()
 
   const handleStartTour = () => {
+    console.log("Starting tour...", { demoTourSteps })
     startTour(demoTourSteps, "main-demo-tour")
+
+    // Debug: Check if tour actually started
+    setTimeout(() => {
+      console.log("Tour state after start:", {
+        isActive,
+        currentStep,
+        totalSteps,
+        currentStepData: getCurrentStep()
+      })
+    }, 100)
   }
 
   return (

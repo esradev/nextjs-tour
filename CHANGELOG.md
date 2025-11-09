@@ -5,6 +5,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.2] - 2025-11-09
+
+### Fixed
+
+- Fixed "use client" directives being ignored during bundling by removing individual directives and relying on the Rollup banner
+- Fixed GlobalTourOverlay not properly passing lottieAnimationUrl prop to TourOverlay
+- Fixed TourProvider not exposing lottieAnimationUrl and theme through TourContext
+- Improved tooltip positioning calculations with better SSR handling and viewport boundary checks
+- Added comprehensive error handling for missing target elements with retry logic
+- Enhanced Lottie animation loading with proper error handling and validation
+- Added safe guards for localStorage operations and action execution
+- Improved element visibility detection and error reporting
+- Added fallback values for tooltip dimensions during positioning calculations
+
+### Improved
+
+- Better SSR compatibility with typeof window checks
+- More robust element finding with retry mechanism
+- Enhanced error logging for debugging tour issues
+- Safer action execution with try-catch blocks
+
+## [1.0.1] - 2025-11-09
+
+### Fixed
+
+- Fixed TypeScript type definitions for TourStep and UseTourOptions
+- Corrected import paths in GlobalTourOverlay and useTour hook
+
 ## [1.0.0] - 2025-11-09
 
 ### Added

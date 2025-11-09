@@ -1,17 +1,11 @@
-"use client"
-
 import { TourOverlay } from "./TourOverlay"
 import { useTourContext } from "../contexts/TourContext"
 
 interface GlobalTourOverlayProps {
-  lottieAnimationUrl?: string
   className?: string
 }
 
-export function GlobalTourOverlay({
-  lottieAnimationUrl,
-  className
-}: GlobalTourOverlayProps) {
+export function GlobalTourOverlay({ className }: GlobalTourOverlayProps) {
   const {
     isActive,
     getCurrentStep,
@@ -22,8 +16,17 @@ export function GlobalTourOverlay({
     nextStep,
     previousStep,
     skipTour,
-    completeTour
+    completeTour,
+    lottieAnimationUrl
   } = useTourContext()
+
+  // Debug logging
+  console.log("GlobalTourOverlay render:", {
+    isActive,
+    currentStep,
+    totalSteps,
+    currentStepData: getCurrentStep()
+  })
 
   return (
     <TourOverlay
