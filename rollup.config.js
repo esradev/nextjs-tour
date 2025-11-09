@@ -5,6 +5,8 @@ import peerDepsExternal from "rollup-plugin-peer-deps-external"
 import postcss from "rollup-plugin-postcss"
 import { dts } from "rollup-plugin-dts"
 import { readFileSync } from "fs"
+import autoprefixer from "autoprefixer"
+import tailwindcssPostcss from "@tailwindcss/postcss"
 
 const packageJson = JSON.parse(readFileSync("./package.json", "utf-8"))
 
@@ -18,7 +20,8 @@ export default [
     plugins: [
       postcss({
         extract: true,
-        minimize: true
+        minimize: true,
+        plugins: [tailwindcssPostcss(), autoprefixer()]
       })
     ]
   },
