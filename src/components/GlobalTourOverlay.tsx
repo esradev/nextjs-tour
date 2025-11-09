@@ -1,5 +1,6 @@
 import { TourOverlay } from "./TourOverlay"
 import { useTourContext } from "../contexts/TourContext"
+import { useEffect } from "react"
 
 interface GlobalTourOverlayProps {
   className?: string
@@ -20,13 +21,15 @@ export function GlobalTourOverlay({ className }: GlobalTourOverlayProps) {
     lottieAnimationUrl
   } = useTourContext()
 
-  // Debug logging
-  console.log("GlobalTourOverlay render:", {
-    isActive,
-    currentStep,
-    totalSteps,
-    currentStepData: getCurrentStep()
-  })
+  // Toggle debug badge in the demo layout when tour is active
+  useEffect(() => {
+    const el =
+      typeof document !== "undefined"
+        ? document.getElementById("tour-debug")
+        : null
+    if (!el) return
+    el.style.display = isActive ? "block" : "none"
+  }, [isActive])
 
   return (
     <TourOverlay

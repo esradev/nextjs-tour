@@ -39,10 +39,20 @@ npm install lottie-react
 
 ## Quick Start
 
-### 1. Wrap your app with TourProvider
+### 1. Import the CSS styles
+
+Add the tour styles to your app:
+
+```tsx
+// app/layout.tsx or app/globals.css
+import "nextjs-tour/styles.css"
+```
+
+### 2. Wrap your app with TourProvider
 
 ```tsx
 // app/layout.tsx or pages/_app.tsx
+import "nextjs-tour/styles.css"
 import { TourProvider } from "nextjs-tour"
 
 export default function RootLayout({
@@ -60,10 +70,11 @@ export default function RootLayout({
 }
 ```
 
-### 2. Add GlobalTourOverlay to your layout
+### 3. Add GlobalTourOverlay to your layout
 
 ```tsx
 // app/layout.tsx
+import "nextjs-tour/styles.css"
 import { TourProvider, GlobalTourOverlay } from "nextjs-tour"
 
 export default function RootLayout({
@@ -84,7 +95,7 @@ export default function RootLayout({
 }
 ```
 
-### 3. Define your tour steps
+### 4. Define your tour steps
 
 ```tsx
 // lib/tour-config.ts
@@ -122,7 +133,7 @@ export const dashboardTourSteps: TourStep[] = [
 ]
 ```
 
-### 4. Start the tour
+### 5. Start the tour
 
 ```tsx
 // components/TourButton.tsx

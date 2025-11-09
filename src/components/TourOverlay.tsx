@@ -434,6 +434,7 @@ export function TourOverlay({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="absolute inset-0 bg-black/60 pointer-events-auto"
+            style={{ background: "rgba(0,0,0,0.6)" }}
             onClick={onSkip}
           />
 
@@ -451,7 +452,10 @@ export function TourOverlay({
               transform: "translate(-50%, -50%)"
             }}
           >
-            <div className="w-80 max-w-sm shadow-2xl border-0 bg-white dark:bg-gray-900 backdrop-blur-sm rounded-lg p-6">
+            <div
+              className="w-80 max-w-sm shadow-2xl border-0 bg-white dark:bg-gray-900 backdrop-blur-sm rounded-lg p-6"
+              style={{ background: "white" }}
+            >
               <div className="mb-4">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
@@ -543,7 +547,14 @@ export function TourOverlay({
         className={`fixed inset-0 z-50 pointer-events-none ${className}`}
         style={{
           isolation: "isolate",
-          overflow: "hidden" // Prevent horizontal scroll
+          overflow: "hidden", // Prevent horizontal scroll
+          // Fallbacks if Tailwind utilities are not present
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          zIndex: 9999
         }}
       >
         {/* Overlay with cutout */}
@@ -553,6 +564,7 @@ export function TourOverlay({
           exit={{ opacity: 0 }}
           className="absolute inset-0 bg-black/60 pointer-events-auto"
           style={{
+            background: "rgba(0,0,0,0.6)",
             clipPath: `polygon(
               0% 0%,
               0% 100%,
@@ -586,7 +598,8 @@ export function TourOverlay({
             left: elementPosition.left - 4,
             width: elementPosition.width + 8,
             height: elementPosition.height + 8,
-            pointerEvents: "none"
+            pointerEvents: "none",
+            borderColor: "#3b82f6"
           }}
         />
 
@@ -608,7 +621,8 @@ export function TourOverlay({
             left: elementPosition.left - 8,
             width: elementPosition.width + 16,
             height: elementPosition.height + 16,
-            pointerEvents: "none"
+            pointerEvents: "none",
+            borderColor: "rgba(59,130,246,0.3)"
           }}
         />
 
@@ -625,7 +639,10 @@ export function TourOverlay({
             top: tooltipPosition.y
           }}
         >
-          <div className="w-80 max-w-sm shadow-2xl border-0 bg-white dark:bg-gray-900 backdrop-blur-sm rounded-lg p-6">
+          <div
+            className="w-80 max-w-sm shadow-2xl border-0 bg-white dark:bg-gray-900 backdrop-blur-sm rounded-lg p-6"
+            style={{ background: "white" }}
+          >
             <div className="mb-4">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">

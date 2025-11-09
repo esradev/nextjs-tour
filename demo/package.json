@@ -13,7 +13,7 @@
     "framer-motion": "^10.0.0",
     "lottie-react": "^2.4.0",
     "next": "^16.0.1",
-    "nextjs-tour": "^1.0.2",
+    "nextjs-tour": "^1.0.7",
     "react": "^18.0.0",
     "react-dom": "^18.0.0"
   },

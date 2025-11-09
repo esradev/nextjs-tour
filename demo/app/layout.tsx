@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
+import "nextjs-tour/styles.css"
 import { TourProvider, GlobalTourOverlay } from "nextjs-tour"
 
 const inter = Inter({ subsets: ["latin"] })

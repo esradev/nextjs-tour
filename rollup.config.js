@@ -2,12 +2,27 @@ import resolve from "@rollup/plugin-node-resolve"
 import commonjs from "@rollup/plugin-commonjs"
 import typescript from "@rollup/plugin-typescript"
 import peerDepsExternal from "rollup-plugin-peer-deps-external"
+import postcss from "rollup-plugin-postcss"
 import { dts } from "rollup-plugin-dts"
 import { readFileSync } from "fs"
 
 const packageJson = JSON.parse(readFileSync("./package.json", "utf-8"))
 
 export default [
+  // CSS build
+  {
+    input: "src/styles.css",
+    output: {
+      file: "dist/styles.css"
+    },
+    plugins: [
+      postcss({
+        extract: true,
+        minimize: true
+      })
+    ]
+  },
+  // JavaScript builds
   {
     input: "src/index.ts",
     output: [
@@ -32,6 +47,7 @@ export default [
     ],
     external: ["react", "react-dom", "next", "framer-motion", "lottie-react"]
   },
+  // TypeScript declarations
   {
     input: "src/index.ts",
     output: [{ file: "dist/index.d.ts", format: "esm" }],
