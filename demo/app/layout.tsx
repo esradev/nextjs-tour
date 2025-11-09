@@ -15,10 +15,16 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  // Use different animation URL based on environment
+  const lottieUrl =
+    process.env.NODE_ENV === "production"
+      ? "/nextjs-tour/celebration.json"
+      : "/celebration.json"
+
   return (
     <html lang="en">
       <body className={inter.className}>
-        <TourProvider lottieAnimationUrl="/nextjs-tour/celebration.json">
+        <TourProvider lottieAnimationUrl={lottieUrl}>
           {children}
           <GlobalTourOverlay />
         </TourProvider>

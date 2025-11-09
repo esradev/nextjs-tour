@@ -4,16 +4,16 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "cross-env NEXT_BUILD_MODE=export next build",
     "start": "next start",
     "export": "next export",
-    "deploy": "npm run build && npm run export"
+    "deploy": "npm run build"
   },
   "dependencies": {
     "framer-motion": "^10.0.0",
     "lottie-react": "^2.4.0",
-    "next": "^14.0.0",
-    "nextjs-tour": "^1.0.0",
+    "next": "^16.0.1",
+    "nextjs-tour": "^1.0.1",
     "react": "^18.0.0",
     "react-dom": "^18.0.0"
   },
@@ -22,6 +22,7 @@
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
     "autoprefixer": "^10.0.0",
+    "cross-env": "^10.1.0",
     "postcss": "^8.0.0",
     "tailwindcss": "^3.0.0",
     "typescript": "^5.0.0"

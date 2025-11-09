@@ -63,3 +63,6 @@ jspm_packages/
 .rts2_cache_cjs/
 .rts2_cache_es/
 .rts2_cache_umd/
+
+demo/.next/
+demo/out/
