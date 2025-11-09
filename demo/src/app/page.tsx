@@ -2,9 +2,141 @@
 
 import { useState } from "react"
 import { motion } from "framer-motion"
+import { useTourContext } from "nextjs-tour"
+import type { TourStep } from "nextjs-tour"
 
-// This is a simplified demo page that showcases the layout and design
-// The actual tour functionality will be added once the package is properly installed
+// Define the main demo tour steps
+const demoTourSteps: TourStep[] = [
+  {
+    id: "welcome",
+    target: ".hero-section",
+    title: "Welcome to Next.js Tour! 🎉",
+    content:
+      "This is a comprehensive tour system for Next.js applications. Let's explore the features together!",
+    position: "center",
+    showPrevious: false,
+    showSkip: true
+  },
+  {
+    id: "header",
+    target: ".main-header",
+    title: "Main Navigation",
+    content: "This is the main header with navigation links and actions.",
+    position: "bottom"
+  },
+  {
+    id: "dashboard-card",
+    target: ".dashboard-card",
+    title: "Dashboard Overview",
+    content: "Here you can see your main dashboard metrics and quick stats.",
+    position: "right"
+  },
+  {
+    id: "features-grid",
+    target: ".features-grid",
+    title: "Feature Showcase",
+    content:
+      "Explore different positioning options and tour features in this grid.",
+    position: "top"
+  },
+  {
+    id: "installation",
+    target: ".installation-section",
+    title: "Quick Start Guide",
+    content:
+      "Learn how to install and use the nextjs-tour package in your projects.",
+    position: "left"
+  },
+  {
+    id: "footer",
+    target: ".demo-footer",
+    title: "That's it! 🎊",
+    content:
+      "You've completed the tour! The tour system supports many positioning options and customization features.",
+    position: "top"
+  }
+]
+
+function TourControls() {
+  const { startTour, isActive } = useTourContext()
+
+  const handleStartTour = () => {
+    startTour(demoTourSteps, "main-demo-tour")
+  }
+
+  return (
+    <div className="flex gap-4 justify-center">
+      <button
+        onClick={handleStartTour}
+        disabled={isActive}
+        className={`btn-primary ${
+          isActive ? "opacity-50 cursor-not-allowed" : ""
+        }`}
+      >
+        {isActive ? "Tour Active" : "Start Interactive Tour"}
+      </button>
+
+      <button
+        onClick={() => {
+          localStorage.removeItem("tour-completed-main-demo-tour")
+          window.location.reload()
+        }}
+        className="btn-secondary"
+      >
+        Reset Tour
+      </button>
+    </div>
+  )
+}
+
+function FeatureCard({
+  title,
+  description,
+  icon,
+  position = "top"
+}: {
+  title: string
+  description: string
+  icon: string
+  position?: string
+}) {
+  const { startTour } = useTourContext()
+
+  const singleStepTour: TourStep[] = [
+    {
+      id: `feature-${title.toLowerCase().replace(/\s+/g, "-")}`,
+      target: `[data-tour="feature-${title
+        .toLowerCase()
+        .replace(/\s+/g, "-")}"]`,
+      title: `${icon} ${title}`,
+      content: `${description} Click to see this positioning in action!`,
+      position: position as any
+    }
+  ]
+
+  return (
+    <motion.div
+      data-tour={`feature-${title.toLowerCase().replace(/\s+/g, "-")}`}
+      className="card hover:shadow-xl transition-shadow duration-300 cursor-pointer"
+      onClick={() =>
+        startTour(
+          singleStepTour,
+          `feature-${title.toLowerCase().replace(/\s+/g, "-")}-tour`
+        )
+      }
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      whileHover={{ y: -5 }}
+    >
+      <div className="text-3xl mb-3">{icon}</div>
+      <h3 className="text-lg font-semibold mb-2">{title}</h3>
+      <p className="text-gray-600 text-sm mb-3">{description}</p>
+      <p className="text-xs text-blue-600 font-medium">Position: {position}</p>
+      <p className="text-xs text-gray-500 mt-1">Click to try this position!</p>
+    </motion.div>
+  )
+}
 
 export default function HomePage() {
   const [stats] = useState({
@@ -73,11 +205,7 @@ export default function HomePage() {
               flexible positioning, and Lottie celebration effects.
             </p>
 
-            <div className="flex gap-4 justify-center">
-              <button className="btn-primary">Start Tour (Demo)</button>
-
-              <button className="btn-secondary">View Documentation</button>
-            </div>
+            <TourControls />
 
             <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
               <div className="dashboard-card card text-center">
@@ -108,75 +236,69 @@ export default function HomePage() {
         <div className="container mx-auto px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Tour Position Options
+              Interactive Tour Positions
             </h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
-              The nextjs-tour package supports 13 different positioning options
-              for maximum flexibility.
+              Click on any feature card below to see different tour positioning
+              options in action.
             </p>
           </div>
 
           <div className="features-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
-            {[
-              {
-                title: "Top Position",
-                icon: "⬆️",
-                description: "Shows tooltip above the target element"
-              },
-              {
-                title: "Bottom Position",
-                icon: "⬇️",
-                description: "Shows tooltip below the target element"
-              },
-              {
-                title: "Left Position",
-                icon: "⬅️",
-                description: "Shows tooltip to the left of target"
-              },
-              {
-                title: "Right Position",
-                icon: "➡️",
-                description: "Shows tooltip to the right of target"
-              },
-              {
-                title: "Top-Left",
-                icon: "↖️",
-                description: "Combines top position with left alignment"
-              },
-              {
-                title: "Top-Right",
-                icon: "↗️",
-                description: "Combines top position with right alignment"
-              },
-              {
-                title: "Bottom-Left",
-                icon: "↙️",
-                description: "Combines bottom position with left alignment"
-              },
-              {
-                title: "Center",
-                icon: "🎯",
-                description: "Shows tooltip in the center of viewport"
-              }
-            ].map((feature, index) => (
-              <motion.div
-                key={feature.title}
-                className="card hover:shadow-xl transition-shadow duration-300"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: index * 0.1 }}
-              >
-                <div className="text-3xl mb-3">{feature.icon}</div>
-                <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
-                <p className="text-gray-600 text-sm">{feature.description}</p>
-              </motion.div>
-            ))}
+            <FeatureCard
+              title="Top Position"
+              description="Shows tooltip above the target element"
+              icon="⬆️"
+              position="top"
+            />
+            <FeatureCard
+              title="Bottom Position"
+              description="Shows tooltip below the target element"
+              icon="⬇️"
+              position="bottom"
+            />
+            <FeatureCard
+              title="Left Position"
+              description="Shows tooltip to the left of target"
+              icon="⬅️"
+              position="left"
+            />
+            <FeatureCard
+              title="Right Position"
+              description="Shows tooltip to the right of target"
+              icon="➡️"
+              position="right"
+            />
+            <FeatureCard
+              title="Top-Left"
+              description="Combines top position with left alignment"
+              icon="↖️"
+              position="top-left"
+            />
+            <FeatureCard
+              title="Top-Right"
+              description="Combines top position with right alignment"
+              icon="↗️"
+              position="top-right"
+            />
+            <FeatureCard
+              title="Bottom-Left"
+              description="Combines bottom position with left alignment"
+              icon="↙️"
+              position="bottom-left"
+            />
+            <FeatureCard
+              title="Center"
+              description="Shows tooltip in the center of viewport"
+              icon="🎯"
+              position="center"
+            />
           </div>
         </div>
       </section>
 
       {/* Installation Section */}
-      <section className="py-16 bg-white">
+      <section className="installation-section py-16 bg-white">
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-12">
