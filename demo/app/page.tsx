@@ -131,7 +131,7 @@ export default function HomePage() {
         </p>
         <div className="space-y-4">
           <div className="flex items-start gap-4">
-            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground font-bold text-sm flex-shrink-0">
+            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground font-bold text-sm shrink-0">
               1
             </div>
             <div className="flex-1">
@@ -143,7 +143,7 @@ export default function HomePage() {
             </div>
           </div>
           <div className="flex items-start gap-4">
-            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground font-bold text-sm flex-shrink-0">
+            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground font-bold text-sm shrink-0">
               2
             </div>
             <div className="flex-1">
@@ -153,7 +153,7 @@ export default function HomePage() {
             </div>
           </div>
           <div className="flex items-start gap-4">
-            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground font-bold text-sm flex-shrink-0">
+            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground font-bold text-sm shrink-0">
               3
             </div>
             <div className="flex-1">
