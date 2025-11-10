@@ -1,51 +1,32 @@
+import type React from "react"
 import type { Metadata } from "next"
-import { Inter } from "next/font/google"
+import { Geist, Geist_Mono } from "next/font/google"
+import { Analytics } from "@vercel/analytics/next"
+import { Sidebar } from "@/components/sidebar"
 import "./globals.css"
-import "nextjs-tour/styles.css"
-import { TourProvider, GlobalTourOverlay } from "nextjs-tour"
 
-const inter = Inter({ subsets: ["latin"] })
+const _geist = Geist({ subsets: ["latin"] })
+const _geistMono = Geist_Mono({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Next.js Tour Demo",
-  description: "A comprehensive demonstration of the nextjs-tour package"
+  title: "Next.js Tour - Beautiful Tour System for Next.js",
+  description: "Create engaging onboarding experiences with smooth animations and flexible positioning.",
+  generator: "v0.app",
 }
 
 export default function RootLayout({
-  children
-}: {
+  children,
+}: Readonly<{
   children: React.ReactNode
-}) {
-  // Use different animation URL based on environment
-  const lottieUrl =
-    process.env.NODE_ENV === "production"
-      ? "/nextjs-tour/celebration.json"
-      : "/celebration.json"
-
+}>) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        <TourProvider lottieAnimationUrl={lottieUrl}>
-          {children}
-          <GlobalTourOverlay />
-          {/* Debug indicator */}
-          <div
-            id="tour-debug"
-            style={{
-              position: "fixed",
-              top: "10px",
-              right: "10px",
-              background: "red",
-              color: "white",
-              padding: "5px",
-              fontSize: "12px",
-              zIndex: 9999,
-              display: "none"
-            }}
-          >
-            Tour Debug Active
-          </div>
-        </TourProvider>
+    <html lang="en" className="dark">
+      <body className={`font-sans antialiased`}>
+        <Sidebar />
+        <main className="lg:pl-64">
+          <div className="max-w-5xl mx-auto px-6 lg:px-12 py-8 lg:py-12">{children}</div>
+        </main>
+        <Analytics />
       </body>
     </html>
   )
