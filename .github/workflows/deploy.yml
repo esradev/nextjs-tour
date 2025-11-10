@@ -35,6 +35,12 @@ jobs:
       - name: Build package
         run: npm run build
 
+      - name: Copy package to demo node_modules
+        run: |
+          mkdir -p demo/node_modules/nextjs-tour
+          cp -r dist/* demo/node_modules/nextjs-tour/
+          cp package.json demo/node_modules/nextjs-tour/
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
         with:
