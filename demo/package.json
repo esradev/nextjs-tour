@@ -10,12 +10,14 @@
     "deploy": "npm run build"
   },
   "dependencies": {
+    "@tailwindcss/postcss": "^4.1.17",
     "framer-motion": "^10.0.0",
     "lottie-react": "^2.4.0",
     "next": "^16.0.1",
     "nextjs-tour": "^1.0.10",
     "react": "^18.0.0",
-    "react-dom": "^18.0.0"
+    "react-dom": "^18.0.0",
+    "tailwindcss": "^4.1.17"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
@@ -24,7 +26,6 @@
     "autoprefixer": "^10.0.0",
     "cross-env": "^10.1.0",
     "postcss": "^8.0.0",
-    "tailwindcss": "^3.0.0",
     "typescript": "^5.0.0"
   }
 }
