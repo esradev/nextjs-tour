@@ -42,13 +42,7 @@ jobs:
 
       - name: Install demo dependencies
         working-directory: ./demo
-        run: |
-          # Install peer dependencies first
-          npm install framer-motion lottie-react --legacy-peer-deps
-          # Install the local package
-          npm install ../dist --legacy-peer-deps
-          # Install remaining dependencies
-          npm ci --legacy-peer-deps
+        run: npm ci --legacy-peer-deps
 
       - name: Build demo with Next.js
         working-directory: ./demo
